@@ -1,10 +1,13 @@
 package com.learning.courses.service;
 
 import com.learning.courses.dto.CreatePersonDTO;
+import com.learning.courses.dto.PaperDTO;
 import com.learning.courses.dto.PersonDTO;
 import com.learning.courses.exception.EntityNotFoundException;
 import com.learning.courses.mapper.PersonMapper;
+import com.learning.courses.model.Paper;
 import com.learning.courses.model.Person;
+import com.learning.courses.model.enums.Role;
 import com.learning.courses.repository.PersonRepository;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -48,6 +51,39 @@ public class PersonService {
     person.setIdentityNumber(updatedPerson.getIdentityNumber());
     person = personRepository.save(person);
     return personMapper.toDTO(person);
+  }
+
+  @Transactional
+  public PersonDTO addPaperToTutor(Long personId, PaperDTO paperDTO) {
+    var person = personRepository.findById(personId).orElseThrow(() -> new RuntimeException("Person not found with id: " + personId));
+
+    Paper paper = new Paper();
+    paper.setTitle(paperDTO.getTitle());
+    paper.setIsbn(paperDTO.getIsbn());
+    paper.setTopic(paperDTO.getType());
+    paper.setType(paperDTO.getTopic());
+
+    person.addPaperToTutor(paper);
+
+    personRepository.save(person);
+    return personMapper.toDTO(person);
+  }
+
+  @Transactional
+  public PersonDTO removePaperFromTutor(Long personId, Long paperId) {
+
+    Person person = personRepository.findById(personId)
+            .orElseThrow(() -> new RuntimeException("Person not found with id: " + personId));
+
+    Paper paperToRemove = person.getPapers().stream()
+            .filter(paper -> paper.getId().equals(paperId))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("Paper not found with id: " + paperId));
+
+    person.removePaperFromTutor(paperToRemove);
+    personRepository.save(person);
+    return personMapper.toDTO(person);
+
   }
 
 }
