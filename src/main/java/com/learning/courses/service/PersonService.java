@@ -57,11 +57,16 @@ public class PersonService {
   public PersonDTO addPaperToTutor(Long personId, PaperDTO paperDTO) {
     var person = personRepository.findById(personId).orElseThrow(() -> new RuntimeException("Person not found with id: " + personId));
 
+    if (person.getRole() != Role.TUTOR) {
+      throw new IllegalStateException("Only tutors can have papers assigned.");
+    }
+
     Paper paper = new Paper();
     paper.setTitle(paperDTO.getTitle());
     paper.setIsbn(paperDTO.getIsbn());
-    paper.setTopic(paperDTO.getType());
-    paper.setType(paperDTO.getTopic());
+    paper.setTopic(paperDTO.getTopic());
+    paper.setType(paperDTO.getType());
+    paper.setAdditionalAuthors(paperDTO.getAdditionalAuthors());
 
     person.addPaperToTutor(paper);
 

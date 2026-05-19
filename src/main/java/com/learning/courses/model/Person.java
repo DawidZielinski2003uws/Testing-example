@@ -47,10 +47,13 @@ private List<Paper> papers;
 
 public void addPaperToTutor(Paper paper) {
   papers.add(paper);
+  paper.setTutor(this);
 }
 
 public void removePaperFromTutor(Paper paper) {
   papers.remove(paper);
+  paper.setTutor(null);
+
 }
 
 }
